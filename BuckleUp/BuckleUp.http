@@ -1,0 +1,6 @@
+@BuckleUp_HostAddress = http://localhost:5034
+
+GET {{BuckleUp_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
