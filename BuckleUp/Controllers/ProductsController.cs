@@ -13,12 +13,15 @@ namespace BuckleUp.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly IMultiTenantContextAccessor<TenantInfo> _tenantContextAccessor;
+        private readonly IMultiTenantContextAccessor<Tenant> _tenantContextAccessor;
 
-        public ProductsController(AppDbContext db, IMultiTenantContextAccessor<TenantInfo> tenantContextAccessor)
+        public ProductsController(AppDbContext db, IMultiTenantContextAccessor<Tenant> tenantContextAccessor)
         {
+            //var tenantIn = _tenantContextAccessor.MultiTenantContext;
+
             _db = db;
             _tenantContextAccessor = tenantContextAccessor;
+            var tenant = _tenantContextAccessor.MultiTenantContext;
         }
         // GET
         [HttpGet]
@@ -37,6 +40,9 @@ namespace BuckleUp.Controllers
         public IActionResult Create(List<Product> products)
         {
             var tenantInfo = _tenantContextAccessor.MultiTenantContext?.TenantInfo;
+
+            var tenantIn = HttpContext.GetMultiTenantContext<Tenant>()?.TenantInfo;
+
             if (tenantInfo == null)
             {
                 return BadRequest("Tenant information is missing.");

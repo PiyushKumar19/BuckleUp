@@ -8,20 +8,26 @@ namespace BuckleUp.DatabaseContext
 {
     public class AppDbContext : MultiTenantDbContext
     {
-        private readonly IMultiTenantContextAccessor _multiTenantContextAccessor;
+        private readonly IMultiTenantContextAccessor<Tenant> _multiTenantContextAccessor;
 
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Tenant> Tenants { get; set; }
 
-        public AppDbContext(IMultiTenantContextAccessor multiTenantContextAccessor, DbContextOptions<AppDbContext> options) 
+        public AppDbContext(IMultiTenantContextAccessor<Tenant> multiTenantContextAccessor, DbContextOptions<AppDbContext> options) 
             : base(multiTenantContextAccessor, options)
         {
             _multiTenantContextAccessor = multiTenantContextAccessor ?? throw new ArgumentNullException(nameof(multiTenantContextAccessor));
+
+            var tenant = _multiTenantContextAccessor.MultiTenantContext;
+
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var tenant = _multiTenantContextAccessor.MultiTenantContext;
 
             var productEntity = modelBuilder.Entity<Product>();
 
@@ -37,10 +43,8 @@ namespace BuckleUp.DatabaseContext
 
             if (tenantContext?.TenantInfo != null)
             {
-                return tenantContext.TenantInfo.Id; // Assuming TenantInfo has an Id property
+                return tenantContext.TenantInfo.Id; 
             }
-
-            // Handle case where tenant context or tenant info is null
             throw new InvalidOperationException("Unable to determine current tenant.");
         }
 
