@@ -14,7 +14,7 @@ builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
 {
     var multiTenantContextAccessor = serviceProvider.GetRequiredService<IMultiTenantContextAccessor<Tenant>>();
     var tenantInfo = multiTenantContextAccessor.MultiTenantContext?.TenantInfo;
-    options.UseSqlServer("ConnectionString");
+    options.UseSqlServer("Data Source=MAMTA\\SQLEXPRESS;database = BuckleUp; Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False");
     options.EnableSensitiveDataLogging(); // Enable sensitive data logging for debugging
 
     // Additional DbContext configuration if needed

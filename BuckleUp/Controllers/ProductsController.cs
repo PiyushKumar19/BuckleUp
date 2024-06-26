@@ -27,7 +27,7 @@ namespace BuckleUp.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_db.Products.ToList());
+            return Ok(_db.Products.IgnoreQueryFilters().ToList());
         }
 
         [HttpGet("{id}")]
