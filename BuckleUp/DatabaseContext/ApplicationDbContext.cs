@@ -18,6 +18,7 @@ namespace BuckleUp.DatabaseContext
 
         public DbSet<Tenant> Tenants { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,7 +30,15 @@ namespace BuckleUp.DatabaseContext
                 Console.WriteLine("Warning: Tenant information is missing. Query filter for tenant-specific entities will not be applied.");
             }
 
+            modelBuilder.Entity<User>()
+            .HasOne(u => u.Tenant)
+            .WithMany(t => t.Users)
+            .HasForeignKey(u => u.TenantId)
+            .IsRequired();
+
+            // Apply query filter for tenant-specific entities
             modelBuilder.Entity<Product>().HasQueryFilter(p => p.TenantId == tenant.Identifier);
+            modelBuilder.Entity<User>().HasQueryFilter(u => u.TenantId == tenant.Id);
         }
     }
 

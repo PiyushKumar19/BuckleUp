@@ -8,5 +8,6 @@ namespace BuckleUp.Models
         public string? Id { get; set; }
         public string Identifier { get; set; }
         public string Name { get; set; }
+        public ICollection<User>? Users { get; set; }
     }
 }

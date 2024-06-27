@@ -14,9 +14,10 @@ namespace BuckleUp.DatabaseContext
 
         public async Task InvokeAsync(HttpContext context, TenantDbContext tenantDbContext)
         {
-            if (context.Request.Headers.TryGetValue("TenantId", out var tenantId))
+            var tenantClaim = context.User.FindFirst("TenantId").Value;
+            if (tenantClaim is not null)
             {
-                var tenant = await tenantDbContext.Tenants.FirstOrDefaultAsync(t => t.Identifier == tenantId.ToString());
+                var tenant = await tenantDbContext.Tenants.FirstOrDefaultAsync(t => t.Identifier == tenantClaim.ToString());
                 if (tenant != null)
                 {
                     context.Items["Tenant"] = tenant;

@@ -3,6 +3,7 @@ using BuckleUp.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BuckleUp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240627174944_Modified the foreign key to Identifier of Tenants in Users table")]
+    partial class ModifiedtheforeignkeytoIdentifierofTenantsinUserstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,13 +82,13 @@ namespace BuckleUp.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<string>("TenantId")
+                    b.Property<string>("TenantIdentifier")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TenantId");
+                    b.HasIndex("TenantIdentifier");
 
                     b.ToTable("Users");
                 });
@@ -94,7 +97,7 @@ namespace BuckleUp.Migrations
                 {
                     b.HasOne("BuckleUp.Models.Tenant", "Tenant")
                         .WithMany("Users")
-                        .HasForeignKey("TenantId")
+                        .HasForeignKey("TenantIdentifier")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
