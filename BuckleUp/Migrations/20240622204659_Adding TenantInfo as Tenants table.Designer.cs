@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BuckleUp.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20240622204659_Adding TenantInfo as Tenants table")]
     partial class AddingTenantInfoasTenantstable
     {

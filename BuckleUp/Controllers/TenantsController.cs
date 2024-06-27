@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BuckleUp.DatabaseContext;
 using BuckleUp.Models;
 using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
@@ -11,10 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 public class TenantsController : ControllerBase
 {
     private readonly IMultiTenantStore<Tenant> _tenantStore;
+    private readonly ApplicationDbContext _db;
 
-    public TenantsController(IMultiTenantStore<Tenant> tenantStore)
+    public TenantsController(IMultiTenantStore<Tenant> tenantStore, ApplicationDbContext db)
     {
-        _tenantStore = tenantStore ?? throw new ArgumentNullException(nameof(tenantStore));
+        _tenantStore = tenantStore;
+        _db = db;
     }
 
     // GET: api/tenants
@@ -52,23 +55,34 @@ public class TenantsController : ControllerBase
     }
 
     // POST: api/tenants
+    // POST: api/tenants
     [HttpPost]
     public async Task<ActionResult<TenantInfo>> CreateTenant(Tenant tenantInfo)
     {
         try
         {
-            var success = await _tenantStore.TryAddAsync(tenantInfo);
-            if (!success)
+            //var success = await _tenantStore.TryAddAsync(tenantInfo);
+            var existing = await _tenantStore.TryGetByIdentifierAsync(tenantInfo.Identifier);
+
+            var newTenant = await _db.Tenants.AddAsync(tenantInfo);
+            await _db.SaveChangesAsync();
+            var tenant = await _tenantStore.TryGetByIdentifierAsync(tenantInfo.Identifier);
+            if (existing is not null)
             {
-                return Conflict($"Tenant with ID '{tenantInfo.Id}' or Identifier '{tenantInfo.Identifier}' already exists.");
+                return Conflict($"Tenant with ID '{tenant.Id}' or Identifier '{tenant.Identifier}' already exists.");
             }
-            return CreatedAtAction(nameof(GetTenant), new { id = tenantInfo.Id }, tenantInfo);
+            return CreatedAtAction(nameof(GetTenant), new { id = tenant.Id }, tenant);
         }
         catch (Exception ex)
         {
+            // Log the exception details
+            Console.WriteLine($"Exception occurred while creating tenant: {ex}");
+
+            // Return a 500 Internal Server Error response
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
+
 
     // PUT: api/tenants/5
     [HttpPut("{id}")]

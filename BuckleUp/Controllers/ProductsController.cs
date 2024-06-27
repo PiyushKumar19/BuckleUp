@@ -12,10 +12,10 @@ namespace BuckleUp.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly ApplicationDbContext _db;
         private readonly IMultiTenantContextAccessor<Tenant> _tenantContextAccessor;
 
-        public ProductsController(AppDbContext db, IMultiTenantContextAccessor<Tenant> tenantContextAccessor)
+        public ProductsController(ApplicationDbContext db, IMultiTenantContextAccessor<Tenant> tenantContextAccessor)
         {
             //var tenantIn = _tenantContextAccessor.MultiTenantContext;
 
@@ -27,13 +27,27 @@ namespace BuckleUp.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            return Ok(_db.Products.IgnoreQueryFilters().ToList());
+            try
+            {
+                return Ok(_db.Products.ToList());
+            }
+            catch(Exception ex)
+            {
+                return Ok(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            return Ok(_db.Products.FirstOrDefault(x => x.Id == id));
+            try
+            {
+                return Ok(_db.Products.FirstOrDefault(x => x.Id == id));
+            }
+            catch(Exception ex)
+            {
+                return Ok(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -51,7 +65,7 @@ namespace BuckleUp.Controllers
             // Set the TenantId based on the current tenant context
             foreach (var pro in products)
             {
-                pro.TenantId = tenantInfo.Id;
+                pro.TenantId = tenantInfo.Identifier;
                 Console.WriteLine($"Creating product with TenantId: {pro.TenantId}");
 
             }
